@@ -1,6 +1,6 @@
 {
   "name": "johnny-load",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description":
     "Load johnny-five components using model configuration object",
   "main": "index.js",
@@ -19,6 +19,10 @@
     "url": "https://github.com/mMerlin/johnny-load/issues"
   },
   "homepage": "https://github.com/mMerlin/johnny-load/",
+  "directories": {
+    "doc": "./doc",
+    "examples": "./examples"
+  },
   "dependencies": {
     "johnny-five": "0.x.x"
   },

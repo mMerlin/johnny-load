@@ -1,14 +1,15 @@
 'use strict';
 
-var five, board, fullModel, BASE_PROPERTIES, crumbs,
-  addSubModel, buildComponent, includeReferences, addNearestMatch;
+var five, board, fullModel, BASE_PROPERTIES, crumbs, addSubModel, buildComponent,
+  initializeAfterCreate, doSetupStep, includeReferences, addNearestMatch;
 
 five = require('johnny-five');
 // board is Model scope reference to the board the hardware is attached to
 
 BASE_PROPERTIES = {
   class: "class",
-  opts: "opts",
+  options: "options",
+  setup: "setup",
   children: "children"
 };
 
@@ -58,7 +59,7 @@ addSubModel = function (container, model) {
 
 buildComponent = function (container, config, key) {
   /* jshint maxcomplexity: 10 */
-  var p, dataType;
+  var p;
 
   // IDEA: catch and report model configuration errors, or just let it fail?
   if (!config.class) {
@@ -70,23 +71,18 @@ buildComponent = function (container, config, key) {
   if (typeof five[config.class] !== 'function') {
     throw new Error('unknown johnny-five "' + config.class + '" class');
   }
-  if (typeof config.opts !== 'object') {
-    throw new Error('a component model must have an opts property object');
+  if (typeof config.options !== 'object') {
+    throw new Error('a component model must have an options property object');
   }
-  config.opts.board = board;
-  container[key] = five[config.class](config.opts);
+  config.options.board = board;
+  container[key] = five[config.class](config.options);
   container[key].metadata = {};
 
   for (p in config) {
     if (config.hasOwnProperty(p)) {
       if (!BASE_PROPERTIES[p]) {
-        dataType = typeof config[p];
-        if (dataType !== 'number' && dataType !== 'string') {
-          throw new Error('Unhandled datatype ' + dataType +
-            ' for component metadata property "' + p + '"');
-        }
-
-        container[key].metadata[p] = config[p];
+        // Simple deep object copy
+        container[key].metadata[p] = JSON.parse(JSON.stringify(config[p]));
       }
     }
   }
@@ -96,6 +92,41 @@ buildComponent = function (container, config, key) {
     addSubModel(container[key].children, config.children);
     crumbs.pop();
   }
+
+  if (config.setup !== undefined) {
+    initializeAfterCreate(container[key], config.setup);
+  }
+};
+
+initializeAfterCreate = function (component, setup) {
+  if (typeof setup !== 'object' || setup.length === undefined) {
+    // For any non array datatype, there is only a single step
+    doSetupStep.call(component, setup);
+    return;
+  }
+  setup.forEach(doSetupStep, component);
+};
+
+doSetupStep = function (step) {
+  var method;
+  if (typeof step !== 'object') {
+
+    this[step]();
+    return;
+  }
+
+  for (method in step) {
+    if (step.hasOwnProperty(method)) {
+      if (typeof step[method] !== 'object' ||
+          step[method].length === undefined) {
+        this[method](step[method]);
+        return;
+      }
+      this[method].apply(this, step[method]);
+      return; // Only execute first method in step object
+    }
+  }
+  throw new Error('no method found in setup step');
 };
 
 includeReferences = function (container, label) {

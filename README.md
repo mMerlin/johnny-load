@@ -17,7 +17,3 @@ relays.  The code structure is such that it **should** work without change for
 any currently existing or future johnny-five component.  As long as the component
 class constructor function is a property of the 'johnny-five' object, this
 package should be able to create instances.
-
-TODO: Document the structure for the hardware model object
-TODO: Add unit testing
-todo: Add examples
