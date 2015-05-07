@@ -1,6 +1,6 @@
 # johnny-load
 
-Load a model of board hardware to a johnny-five program from a JSON style javascript description object.
+Load a model of hardware attached to johnny-five supported board from a JSON style javascript description object
 
 This package creates johnny-five components based on properties in a javascript
 object.  That object could be loaded from a JSON file, but it (seems) simpler
