@@ -12,6 +12,6 @@ var model = {
   }
 };
 new five.Board().on('ready', function () {
-  this.children = j5Load(this, model);
+  this.children = j5Load(model);
   this.children.blinker.blink(this.children.blinker.metadata.speed);
 });
