@@ -1,5 +1,6 @@
 'use strict';
-/* jslint maxlen: 100 */
+/*jslint sub: true, maxlen: 100 */
+/* jshint maxlen: 100 */
 
 var assert = require('assert');
 var MockFirmata = require('./util/mock-firmata');
@@ -21,16 +22,15 @@ var propertyCheck = function (actual, expected, context) {
   aType = typeof actual;
   eType = typeof expected;
   if (aType !== eType) {
-    throw new Error('expected "' + context + '" datatype ' + eType +
-      ', actual is ' + aType);
+    throw new Error('expected "' + context + '" datatype ' + eType + ', actual is ' + aType);
   }
 
   if (Array.isArray(expected)) {
     if (!Array.isArray(actual)) {
       throw new Error('actual "' + context + '" should be an Array');
     }
-    assert.strictEqual(actual.length, expected.length,
-      'actual length of "' + context + '" Array different than expected');
+    assert.strictEqual(actual.length, expected.length, 'actual length of "' + context +
+      '" Array different than expected');
     for (i = 0; i < expected.length; i += 1) {
       propertyCheck(actual[i], expected[i], context + '[' + i + ']');
     }
@@ -48,8 +48,7 @@ var propertyCheck = function (actual, expected, context) {
     for (p in expected) {
       if (expected.hasOwnProperty(p)) {
         if (!actual.hasOwnProperty(p)) {
-          throw new Error('expected "' + context + '.' + p +
-            '" property does not exist in actual');
+          throw new Error('expected "' + context + '.' + p + '" property does not exist in actual');
         }
         propertyCheck(actual[p], expected[p], context + '.' + p);
       }
@@ -97,26 +96,24 @@ exports['empty'] = {
     test.throws(function () {
       return johnny_load();
     }, function (err) {
-      return err instanceof Error &&
-        err.message === 'Model must be a non-null object';
+      return err instanceof Error && err.message === 'Model must be a non-null object';
     }, 'unexpected error');
 
     test.done();
   },
   'empty model': function (test) {
+    var model, testDescription, backupDescription;
     test.expect(2);
 
-    var testDescription = {},
-      backupDescription = JSON.parse(JSON.stringify(testDescription)),
-      model;
+    testDescription = {};
+    backupDescription = JSON.parse(JSON.stringify(testDescription));
 
     model = johnny_load(testDescription);
     test.deepEqual(model, {}, 'should be empty object.');
-    test.deepEqual(testDescription, backupDescription,
-      'description should not be modified');
+    test.deepEqual(testDescription, backupDescription, 'description should not be modified');
 
     test.done();
-  },
+  }
 };
 
 exports['single'] = {
@@ -125,18 +122,18 @@ exports['single'] = {
     done();
   },
   'simple pin': function (test) {
+    var model, testDescription, backupDescription;
     test.expect(4);
 
-    var testDescription = {
+    testDescription = {
       testPin: {
         class: 'Pin',
         options: {
           pin: 13
         }
       }
-    },
-      backupDescription = JSON.parse(JSON.stringify(testDescription)),
-      model;
+    };
+    backupDescription = JSON.parse(JSON.stringify(testDescription));
 
     test.doesNotThrow(function () {
       model = johnny_load(testDescription);
@@ -158,15 +155,15 @@ exports['single'] = {
 
     test.ok(model.testPin instanceof five.Pin, 'testPin should be a Pin class instance');
 
-    test.deepEqual(testDescription, backupDescription,
-      'description should not be modified');
+    test.deepEqual(testDescription, backupDescription, 'description should not be modified');
 
     test.done();
   },
   'extended pin': function (test) {
+    var model, testDescription, backupDescription;
     test.expect(5);
 
-    var testDescription = {
+    testDescription = {
       testPin: {
         class: 'Pin',
         options: {
@@ -185,9 +182,8 @@ exports['single'] = {
           }
         }
       }
-    },
-      backupDescription = JSON.parse(JSON.stringify(testDescription)),
-      model;
+    };
+    backupDescription = JSON.parse(JSON.stringify(testDescription));
 
     test.doesNotThrow(function () {
       model = johnny_load(testDescription);
@@ -216,41 +212,114 @@ exports['single'] = {
       }, 'model');
     });
 
-    test.equal(model.testPin.setup, undefined,
-      'setup property should not exist');
-    test.equal(model.testPin.metadata.setup, undefined,
-      'setup property should not exist');
+    test.equal(model.testPin.setup, undefined, 'setup property should not exist');
+    test.equal(model.testPin.metadata.setup, undefined, 'setup property should not exist');
 
-    test.deepEqual(testDescription, backupDescription,
-      'description should not be modified');
+    test.deepEqual(testDescription, backupDescription, 'description should not be modified');
+
+    test.done();
+  }
+};
+
+exports['bad arguments'] = {
+  setUp: function (done) {
+
+    done();
+  },
+  'bad class': function (test) {
+    var model, testDescription, backupDescription;
+    test.expect(12);
+
+    testDescription = {
+      testPin: {
+        options: {
+          pin: 13
+        }
+      }
+    };
+    backupDescription = JSON.parse(JSON.stringify(testDescription));
+
+    test.throws(function () { model = johnny_load(testDescription); }, function (err) {
+      return err instanceof TypeError && err.message === 'undefined is not a function';
+    }, 'unexpected error');
+    test.equal(model, undefined);
+    test.deepEqual(testDescription, backupDescription, 'description should not be modified');
+
+    testDescription.testPin.class = 0;
+    backupDescription.testPin.class = 0;
+    test.throws(function () { model = johnny_load(testDescription); }, function (err) {
+      return err instanceof TypeError && err.message === 'undefined is not a function';
+    }, 'unexpected error');
+    test.equal(model, undefined);
+    test.deepEqual(testDescription, backupDescription, 'description should not be modified');
+
+    testDescription.testPin.class = 'NotComponent';
+    backupDescription.testPin.class = 'NotComponent';
+    test.throws(function () { model = johnny_load(testDescription); }, function (err) {
+      return err instanceof TypeError && err.message === 'undefined is not a function';
+    }, 'unexpected error');
+    test.equal(model, undefined);
+    test.deepEqual(testDescription, backupDescription, 'description should not be modified');
+
+    testDescription.testPin.class = 'Fn';
+    backupDescription.testPin.class = 'Fn';
+    test.throws(function () { model = johnny_load(testDescription); }, function (err) {
+      return err instanceof TypeError && err.message === 'object is not a function';
+    }, 'unexpected error');
+    test.equal(model, undefined);
+    test.deepEqual(testDescription, backupDescription, 'description should not be modified');
 
     test.done();
   },
+  'no options': function (test) {
+    var model, testDescription, backupDescription;
+    // test.expect(12);
+
+    testDescription = {
+      testPin: {
+        class: 'Pin'
+      }
+    };
+    backupDescription = JSON.parse(JSON.stringify(testDescription));
+
+    // Needs johnny-five@>0.8.71 to get the expected exception
+    // Do minimal test cases here.  This will quickly git into testing
+    // johnny-five, not johnny-load.  Unless johnny-load (should) intercepts
+    // cases that johnny-five should fail (differently) on.
+
+    // test.doesNotThrow(function () {
+    //   model = johnny_load(testDescription);
+    // });
+    test.throws(function () { model = johnny_load(testDescription); }, function (err) {
+      return err instanceof Error && err.message === 'Pins must have a pin number';
+    }, 'unexpected error');
+    test.equal(model, undefined);
+    test.deepEqual(testDescription, backupDescription, 'description should not be modified');
+
+    testDescription.testPin.options = {};
+    backupDescription.testPin.options = {};
+    test.throws(function () { model = johnny_load(testDescription); }, function (err) {
+      return err instanceof Error && err.message === 'Pins must have a pin number';
+    }, 'unexpected error');
+    test.equal(model, undefined);
+    test.deepEqual(testDescription, backupDescription, 'description should not be modified');
+
+    test.done();
+  }
 };
 
 /* Samples using the various structures for test.throws()
 
-test.throws(function () {
-  return johnny_load();
-});
+test.throws(function () { return johnny_load(); });
 
-test.throws(function () {
-  return johnny_load();
-}, Error);
+test.throws(function () { return johnny_load(); }, Error);
 
-test.throws(function () {
-  return johnny_load();
-}, undefined, 'should throw an error');
+test.throws(function () { return johnny_load(); }, undefined, 'should throw an error');
 
-test.throws(function () {
-  return johnny_load();
-}, Error, 'should throw an error');
+test.throws(function () { return johnny_load(); }, Error, 'should throw an error');
 
-test.throws(function () {
-  return johnny_load();
-}, function (err) {
-  return err instanceof Error &&
-    err.message === 'Model must be a non-null object';
+test.throws(function () { return johnny_load(); }, function (err) {
+  return err instanceof Error && err.message === 'Model must be a non-null object';
 }, 'unexpected error');
 
 */
