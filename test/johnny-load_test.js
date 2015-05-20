@@ -284,12 +284,9 @@ exports['bad arguments'] = {
 
     // Needs johnny-five@>0.8.71 to get the expected exception
     // Do minimal test cases here.  This will quickly git into testing
-    // johnny-five, not johnny-load.  Unless johnny-load (should) intercepts
+    // johnny-five, not johnny-load.  Unless johnny-load (should) intercept
     // cases that johnny-five should fail (differently) on.
 
-    // test.doesNotThrow(function () {
-    //   model = johnny_load(testDescription);
-    // });
     test.throws(function () { model = johnny_load(testDescription); }, function (err) {
       return err instanceof Error && err.message === 'Pins must have a pin number';
     }, 'unexpected error');
@@ -311,13 +308,9 @@ exports['bad arguments'] = {
 /* Samples using the various structures for test.throws()
 
 test.throws(function () { return johnny_load(); });
-
 test.throws(function () { return johnny_load(); }, Error);
-
 test.throws(function () { return johnny_load(); }, undefined, 'should throw an error');
-
 test.throws(function () { return johnny_load(); }, Error, 'should throw an error');
-
 test.throws(function () { return johnny_load(); }, function (err) {
   return err instanceof Error && err.message === 'Model must be a non-null object';
 }, 'unexpected error');

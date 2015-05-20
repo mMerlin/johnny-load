@@ -1,7 +1,7 @@
 {
   "name": "johnny-load",
   "description": "Load johnny-five components using a hardware configuration model object",
-  "version": "0.0.4-2",
+  "version": "0.0.4-3",
   "homepage": "https://github.com/mMerlin/johnny-load",
   "author": {
     "name": "H. Phil Duby"
@@ -31,15 +31,16 @@
     "examples": "./examples"
   },
   "dependencies": {
-    "johnny-five": "rwaldron/johnny-five"
+    "johnny-five": "*"
   },
   "devDependencies": {
+    "grunt": "latest",
     "grunt-contrib-jshint": "latest",
     "grunt-contrib-nodeunit": "latest",
     "grunt-contrib-watch": "latest",
-    "grunt": "latest",
+    "grunt-jslint": "latest",
     "board-io": "latest"
   },
-  "keywords": ["johnny-five", "johnny-load", "hardware"],
+  "keywords": ["johnny-five", "johnny-load", "hardware", "model"],
   "contributors": []
 }

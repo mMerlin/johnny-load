@@ -6,6 +6,7 @@ var util = require("util");
 var mockPins = require("./mock-pins");
 
 function MockFirmata(opts) {
+  var pins, i;
   Board.call(this, {
     quiet: true
   });
@@ -14,23 +15,28 @@ function MockFirmata(opts) {
 
   this.name = "Mock";
 
-  var pins = opts.pins || mockPins.UNO;
+  pins = opts.pins || mockPins.UNO;
 
-  pins.forEach(function(pin) {
+  pins.forEach(function (pin) {
+    /*jslint nomen: true */
     this._pins.push(pin);
+    /*jslint nomen: false */
   }, this);
 
   // set/override for special cases
   // like AdvancedFirmata
-  for (var i in opts) {
+  for (i in opts) {
     /* jshint forin: false */
+    /*jslint forin: false */
     this[i] = opts[i];
+    /* jshint forin: true */
+    /*jslint forin: true */
   }
 }
 
 util.inherits(MockFirmata, Board);
 
 
-MockFirmata.prototype.servoConfig = function() {};
+MockFirmata.prototype.servoConfig = function () { return; };
 
 module.exports = MockFirmata;

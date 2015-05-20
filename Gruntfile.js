@@ -1,11 +1,32 @@
 'use strict';
 
-module.exports = function(grunt) {
+module.exports = function (grunt) {
 
   // Project configuration.
   grunt.initConfig({
     nodeunit: {
-      files: ['test/**/*_test.js'],
+      files: ['test/**/*_test.js']
+    },
+    jslint: {
+      main: {
+        src: [
+          '*.js',
+          '*/*.js',
+          'test/util/*.js'
+        ],
+        directives: {
+          "browser": false,
+          "node": true,
+          "devel": false,
+          "todo": false,
+          "indent": 2,
+          "maxlen": 82
+        },
+        options: {
+          edition: 'latest',
+          failOnError: true
+        }
+      }
     },
     jshint: {
       options: {
@@ -19,7 +40,7 @@ module.exports = function(grunt) {
       },
       test: {
         src: ['test/**/*.js']
-      },
+      }
     },
     watch: {
       gruntfile: {
@@ -33,16 +54,17 @@ module.exports = function(grunt) {
       test: {
         files: '<%= jshint.test.src %>',
         tasks: ['jshint:test', 'nodeunit']
-      },
-    },
+      }
+    }
   });
 
   // These plugins provide necessary tasks.
   grunt.loadNpmTasks('grunt-contrib-nodeunit');
   grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-jslint');
   grunt.loadNpmTasks('grunt-contrib-watch');
 
   // Default task.
-  grunt.registerTask('default', ['jshint', 'nodeunit']);
+  grunt.registerTask('default', ['jshint', 'jslint', 'nodeunit']);
 
 };
